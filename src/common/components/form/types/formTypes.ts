@@ -1,5 +1,7 @@
 import type { Dispatch, ReactElement, SetStateAction } from "react";
 import type { ColumnType } from "./enum";
+import type { Breakpoint } from "@mui/material";
+import type { GridSize } from "@mui/system";
 
 /**
  * Todo: type 명 일괄적으로 변경필요해보임
@@ -21,9 +23,13 @@ type Error = {
 };
 
 export type FormColumnProps<T extends Record<string, unknown>> = {
-  label?: string;
   name: keyof T;
+  label?: string;
   error?: Error;
+  size?:
+    | GridSize
+    | Array<GridSize | null>
+    | { [key in Breakpoint]?: GridSize | null };
 } & ({ type?: Exclude<ColumnType, ColumnType.CUSTOM> } | CustomFormType);
 
 export type FormProps<T extends Record<string, unknown>> = {
@@ -34,7 +40,7 @@ export type FormProps<T extends Record<string, unknown>> = {
 
 type NonCustomFormColum<T extends Record<string, unknown>> = Omit<
   Exclude<FormColumnProps<T>, CustomFormType>,
-  "type"
+  "type" | "size"
 >;
 
 export type BooleanFormColumn<T extends Record<string, unknown>> =

@@ -26,8 +26,7 @@ const Form = <T extends Record<string, unknown>>({
   return (
     <Grid container spacing={2} component="form">
       {columns.map((item) => (
-        // Todo: 컬럼별 사이즈 조절 기능 만들기
-        <Grid size={{ xs: 12, lg: 6 }}>
+        <Grid size={item?.size || { xs: 12 }}>
           {item?.type === ColumnType.CUSTOM ? (
             item?.column
           ) : (
@@ -60,7 +59,7 @@ const FormColumn = <T extends Record<string, unknown>>({
   onValueChange: (e: boolean | string | number) => void;
 }) => {
   return (
-    <FormControl className="w-100" error={error?.isError}>
+    <FormControl className="w-100 mt-20" error={error?.isError}>
       {type === ColumnType.CHECK ? (
         <BooleanTypeColumnn
           type={type}
@@ -86,14 +85,24 @@ const FormColumn = <T extends Record<string, unknown>>({
 const ColumnRenderer = <T extends Record<string, unknown>>({
   type,
   label = "",
+  value = "",
   onValueChange,
 }: NonBooleanFormColumn<T> & {}) => {
-  // console.log(label);
   switch (type) {
     case ColumnType.SELECT:
-      return <Select />;
+      return (
+        <Select
+          value={value}
+          onChange={(e) => onValueChange(e?.target?.value as string)}
+        />
+      );
     case ColumnType.RADIO:
-      return <Radio onChange={(e) => onValueChange(e?.target?.value)} />;
+      return (
+        <Radio
+          value={value}
+          onChange={(e) => onValueChange(e?.target?.value)}
+        />
+      );
     case ColumnType.INPUT:
     default:
       return (
@@ -102,6 +111,7 @@ const ColumnRenderer = <T extends Record<string, unknown>>({
           <Input
             color="info"
             onChange={(e) => onValueChange(e?.target?.value)}
+            value={value}
           />
         </>
       );
