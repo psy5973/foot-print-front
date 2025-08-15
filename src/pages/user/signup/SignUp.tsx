@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material";
 import { useState } from "react";
-import Form from "../../../common/components/form/Form";
+import Form from "../../../common/components/form/FPForm";
 import { ColumnType } from "../../../common/components/form/types/enum";
 
 const SignUp = () => {
@@ -8,13 +8,30 @@ const SignUp = () => {
 
   return (
     <Grid container>
-      <Grid size={{ xs: 12, lg: 12 }}>
+      <Grid size={{ xs: 1, lg: 2 }}></Grid>
+      <Grid size={{ xs: 10, lg: 8 }}>
         <Form
           data={signUpRequest}
           setData={setSignUpRequest}
-          columns={[{ name: "email", type: ColumnType.INPUT }]}
+          columns={[
+            {
+              name: "email",
+              type: ColumnType.INPUT,
+              label: "email",
+              error: { isError: false },
+            },
+            { name: "password", type: ColumnType.INPUT, label: "비밀번호" },
+            {
+              name: "passwordConfirm",
+              type: ColumnType.INPUT,
+              label: "비밀번호 확인",
+            },
+            { name: "userName", type: ColumnType.INPUT, label: "이름" },
+            { name: "birthDt", type: ColumnType.INPUT, label: "생년월일" },
+          ]}
         />
       </Grid>
+      <Grid size={{ xs: 1, lg: 2 }}></Grid>
     </Grid>
   );
 };

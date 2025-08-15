@@ -15,9 +15,15 @@ export type CustomFormType = {
  */
 // export type SelectFormTypeProps = {};
 
+type Error = {
+  isError: boolean;
+  message?: string;
+};
+
 export type FormColumnProps<T extends Record<string, unknown>> = {
   label?: string;
   name: keyof T;
+  error?: Error;
 } & ({ type?: Exclude<ColumnType, ColumnType.CUSTOM> } | CustomFormType);
 
 export type FormProps<T extends Record<string, unknown>> = {

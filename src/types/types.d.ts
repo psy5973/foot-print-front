@@ -1,7 +1,7 @@
 type SignUpRequest = {
   email?: string;
   password?: string;
-  passwordCheck?: string;
+  passwordConfirm?: string;
   userName?: string;
-  birth?: string;
+  birthDt?: string;
 };

@@ -1,9 +1,11 @@
 import {
-  Box,
   Checkbox,
   FormControl,
+  FormControlLabel,
+  FormHelperText,
   Grid,
   Input,
+  InputLabel,
   Radio,
   Select,
 } from "@mui/material";
@@ -22,23 +24,26 @@ const Form = <T extends Record<string, unknown>>({
   columns,
 }: FormProps<T>) => {
   return (
-    <Grid container>
-      <Box component={"form"}>
-        {columns.map((item) => {
-          return item?.type === ColumnType.CUSTOM ? (
+    <Grid container spacing={2} component="form">
+      {columns.map((item) => (
+        // Todo: 컬럼별 사이즈 조절 기능 만들기
+        <Grid size={{ xs: 12, lg: 6 }}>
+          {item?.type === ColumnType.CUSTOM ? (
             item?.column
           ) : (
             <FormColumn
+              label={item?.label || ""}
               type={item?.type}
               name={item?.name}
               value={data[item?.name]}
               onValueChange={(e) =>
                 setData((prev) => ({ ...prev, [item.name]: e }))
               }
+              error={item?.error}
             />
-          );
-        })}
-      </Box>
+          )}
+        </Grid>
+      ))}
     </Grid>
   );
 };
@@ -49,12 +54,13 @@ const FormColumn = <T extends Record<string, unknown>>({
   type = ColumnType.INPUT,
   value,
   onValueChange,
+  error = { isError: false, message: "" },
 }: Exclude<FormColumnProps<T>, CustomFormType> & {
   value: unknown;
   onValueChange: (e: boolean | string | number) => void;
 }) => {
   return (
-    <FormControl error>
+    <FormControl className="w-100" error={error?.isError}>
       {type === ColumnType.CHECK ? (
         <BooleanTypeColumnn
           type={type}
@@ -72,14 +78,17 @@ const FormColumn = <T extends Record<string, unknown>>({
           onValueChange={onValueChange}
         />
       )}
+      {error?.isError && <FormHelperText>{error?.message}</FormHelperText>}
     </FormControl>
   );
 };
 
 const ColumnRenderer = <T extends Record<string, unknown>>({
   type,
+  label = "",
   onValueChange,
 }: NonBooleanFormColumn<T> & {}) => {
+  // console.log(label);
   switch (type) {
     case ColumnType.SELECT:
       return <Select />;
@@ -88,7 +97,13 @@ const ColumnRenderer = <T extends Record<string, unknown>>({
     case ColumnType.INPUT:
     default:
       return (
-        <Input color="info" onChange={(e) => onValueChange(e?.target?.value)} />
+        <>
+          <InputLabel>{label}</InputLabel>
+          <Input
+            color="info"
+            onChange={(e) => onValueChange(e?.target?.value)}
+          />
+        </>
       );
   }
 };
@@ -96,15 +111,21 @@ const ColumnRenderer = <T extends Record<string, unknown>>({
 const BooleanTypeColumnn = <T extends Record<string, unknown>>({
   type = ColumnType.CHECK,
   value = false,
+  label = "",
   onValueChange,
 }: BooleanFormColumn<T>) => {
   switch (type) {
     case ColumnType.CHECK:
     default:
       return (
-        <Checkbox
-          value={value}
-          onChange={(e) => onValueChange(e.target.checked)}
+        <FormControlLabel
+          label={label}
+          control={
+            <Checkbox
+              value={value}
+              onChange={(e) => onValueChange(e.target.checked)}
+            />
+          }
         />
       );
   }
