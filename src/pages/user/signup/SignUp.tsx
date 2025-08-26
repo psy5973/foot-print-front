@@ -1,10 +1,14 @@
 import { Grid } from "@mui/material";
 import { useState } from "react";
-import Form from "../../../common/components/form/FPForm";
+import FPForm from "../../../common/components/form/FPForm";
 import { ColumnType } from "../../../common/components/form/types/enum";
 
 const SignUp = () => {
   const [signUpRequest, setSignUpRequest] = useState<SignUpRequest>({});
+
+  // const handleSubmit = () => {
+  //   console.log("1");
+  // };
 
   return (
     <div>
@@ -16,28 +20,34 @@ const SignUp = () => {
           alignItems={"center"}
           size={{ xs: 10, lg: 4 }}
         >
-          <Form
+          <FPForm
             data={signUpRequest}
             setData={setSignUpRequest}
             columns={[
               {
                 name: "email",
-                type: ColumnType.INPUT,
+                columnType: ColumnType.INPUT,
                 label: "email",
-                error: { isError: false },
+                error: { isError: true },
+                variant: "outlined",
+                placeholder: "123",
               },
               {
                 name: "password",
-                type: ColumnType.INPUT,
+                columnType: ColumnType.INPUT,
                 label: "비밀번호",
               },
               {
                 name: "passwordConfirm",
-                type: ColumnType.INPUT,
+                columnType: ColumnType.INPUT,
                 label: "비밀번호 확인",
               },
-              { name: "userName", type: ColumnType.INPUT, label: "이름" },
-              { name: "birthDt", type: ColumnType.INPUT, label: "생년월일" },
+              { name: "userName", columnType: ColumnType.INPUT, label: "이름" },
+              {
+                name: "birthDt",
+                columnType: ColumnType.INPUT,
+                label: "생년월일",
+              },
             ]}
           />
         </Grid>

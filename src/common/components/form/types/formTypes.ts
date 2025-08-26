@@ -1,77 +1,78 @@
-import type { Dispatch, ReactElement, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import type { ColumnType } from "./enum";
-import type { Breakpoint } from "@mui/material";
-import type { GridSize } from "@mui/system";
+import type {
+  CheckboxProps,
+  RadioProps,
+  SelectProps,
+  TextFieldProps,
+} from "@mui/material";
+import type { Breakpoint, GridSize } from "@mui/system";
 
-/**
- * Todo: type 명 일괄적으로 변경필요해보임
- */
+export interface FormProps<T extends Record<string, unknown>> {
+  data: T;
+  setData: Dispatch<SetStateAction<T>>;
+  columns: FormColumnProps<T>[];
+}
 
-export type CustomFormType = {
-  type: ColumnType.CUSTOM;
-  column: ReactElement;
-};
+export type FormColumnProps<T> =
+  | (CheckColumnProps & BaseFormColumnProps<T>)
+  | (CustomColumnProps & BaseFormColumnProps<T>)
+  | (InputColumnProps & BaseFormColumnProps<T>)
+  | (RadioColumnProps & BaseFormColumnProps<T>)
+  | (SelectColumnProps & BaseFormColumnProps<T>);
 
-/**
- * Todo: SelectType도 추가 옵션 필요(options)
- */
-// export type SelectFormTypeProps = {};
-
-type Error = {
+interface FormError {
   isError: boolean;
   message?: string;
-};
+}
 
-export type FormColumnProps<T extends Record<string, unknown>> = {
+export interface BaseFormColumnProps<T> {
   name: keyof T;
   label?: string;
-  error?: Error;
   size?:
     | GridSize
     | Array<GridSize | null>
     | { [key in Breakpoint]?: GridSize | null };
-} & ({ type?: Exclude<ColumnType, ColumnType.CUSTOM> } | CustomFormType);
+  error?: FormError;
+}
 
-export type FormProps<T extends Record<string, unknown>> = {
-  data: T;
-  setData: Dispatch<SetStateAction<T>>;
-  columns: FormColumnProps<T>[];
-};
+/**
+ * Todo: 추후 unknown 으로 지정된것 확인해볼 필요 있음
+ */
 
-type NonCustomFormColum<T extends Record<string, unknown>> = Omit<
-  Exclude<FormColumnProps<T>, CustomFormType>,
-  "type" | "size"
->;
+// export type BaseColumnFieldProps<T> = {} & (
+//   | (CheckColumnProps & BaseFormColumnProps<T>)
+//   | (CustomColumnProps & BaseFormColumnProps<T>)
+//   | (InputColumnProps & BaseFormColumnProps<T>)
+//   | (RadioColumnProps & BaseFormColumnProps<T>)
+//   | (SelectColumnProps & BaseFormColumnProps<T>)
+);
 
-export type BooleanFormColumn<T extends Record<string, unknown>> =
-  NonCustomFormColum<T> & {
-    type: ColumnType.CHECK;
-    value: boolean;
-    onValueChange: (e: boolean) => void;
-  };
+export interface CustomColumnProps {
+  columnType: ColumnType.CUSTOM;
+  renderComponent: () => React.ReactElement;
+  value?: never;
+}
+export type InputColumnProps = {
+  columnType: ColumnType.INPUT;
+  value: unknown;
+  onValueChange: (e: unknown) => void;
+} & Omit<TextFieldProps, "error" | "value">;
 
-export type NonBooleanFormColumn<T extends Record<string, unknown>> =
-  | InputFormColumn<T>
-  | SelectFormColumn<T>
-  | RadioFormColumn<T>;
+export type RadioColumnProps = {
+  columnType: ColumnType.RADIO;
+  value: unknown;
+  onValueChange: (e: unknown) => void;
+} & Omit<RadioProps, "value">;
 
-type InputFormColumn<T extends Record<string, unknown>> =
-  NonCustomFormColum<T> & {
-    type: Exclude<ColumnType, ColumnType.CHECK | ColumnType.CUSTOM>;
-    value: string | number;
-    onValueChange: (e: string | number) => void;
-  };
+export type SelectColumnProps = {
+  columnType: ColumnType.SELECT;
+  value: unknown;
+  onValueChange: (e: unknown) => void;
+} & Omit<SelectProps, "value">;
 
-type RadioFormColumn<T extends Record<string, unknown>> =
-  NonCustomFormColum<T> & {
-    type: Exclude<ColumnType, ColumnType.CHECK | ColumnType.CUSTOM>;
-    value: string;
-    onValueChange: (e: string) => void;
-  };
-
-type SelectFormColumn<T extends Record<string, unknown>> =
-  NonCustomFormColum<T> & {
-    type: Exclude<ColumnType, ColumnType.CHECK | ColumnType.CUSTOM>;
-    value: string;
-    onValueChange: (e: string) => void;
-  };
+export type CheckColumnProps = {
+  columnType: ColumnType.CHECK;
+  value: unknown;
+  onValueChange: (e: unknown) => void;
+} & Omit<CheckboxProps, "value">;
