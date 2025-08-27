@@ -1,4 +1,5 @@
 import {
+  Button,
   Checkbox,
   FormControl,
   FormHelperText,
@@ -6,6 +7,7 @@ import {
   Radio,
   Select,
   TextField,
+  type ButtonProps,
 } from "@mui/material";
 import { ColumnType } from "./types/enum";
 import type {
@@ -16,14 +18,19 @@ import type {
   SelectColumnProps,
   FormColumnProps,
   CheckColumnProps,
+  ColumnProps,
 } from "./types/formTypes";
+import { cloneElement, type ReactElement } from "react";
 
 const FPForm = <T extends Record<string, unknown>>({
   data,
   setData,
   columns,
+  useButton = false,
+  buttonElement = "submit",
+  onSubmit,
 }: FormProps<T>) => {
-  const renderer = (item: FormColumnProps<T>) => {
+  const columnRenderer = (item: FormColumnProps<T>) => {
     const { columnType } = item;
 
     if (columnType === ColumnType.CUSTOM) {
@@ -33,20 +40,45 @@ const FPForm = <T extends Record<string, unknown>>({
       return (
         <FormColumn
           {...item}
-          value={data[item.name] as unknown}
+          value={(data[item?.name] as unknown) || ""}
           onValueChange={(v: unknown) =>
-            setData((prev) => ({ ...prev, [item.name]: v }))
+            setData((prev) => ({ ...prev, [item?.name]: v }))
           }
         />
       );
     }
   };
 
+  const handleSubmit = () => {
+    if (!onSubmit) {
+      return;
+    }
+
+    onSubmit(data);
+  };
+
   return (
     <Grid container spacing={2} component="form">
       {columns.map((item) => (
-        <Grid size={item?.size || { xs: 12 }}>{renderer(item)}</Grid>
+        <Grid size={item?.colSize || { xs: 12 }}>{columnRenderer(item)}</Grid>
       ))}
+      {useButton && (
+        <div className="w-100 mt-10">
+          {typeof buttonElement === "string" ? (
+            <Button
+              variant="contained"
+              onClick={() => handleSubmit()}
+              fullWidth
+            >
+              {buttonElement}
+            </Button>
+          ) : (
+            cloneElement(buttonElement as ReactElement<ButtonProps>, {
+              onClick: () => handleSubmit(),
+            })
+          )}
+        </div>
+      )}
     </Grid>
   );
 };
@@ -56,13 +88,17 @@ const FormColumn = <T extends Record<string, unknown>>({
   columnType = ColumnType.INPUT,
   onValueChange,
   ...props
-}: Exclude<FormColumnProps<T>, CustomColumnProps> & {}) => {
+}: Exclude<ColumnProps<T>, CustomColumnProps> & {}) => {
   const renderer = () => {
     switch (columnType) {
       case ColumnType.INPUT: {
         const p = { ...(props as InputColumnProps) };
         return (
-          <TextField onChange={(e) => onValueChange(e.target.value)} {...p} />
+          <TextField
+            size="small"
+            onChange={(e) => onValueChange(e.target.value)}
+            {...p}
+          />
         );
       }
       case ColumnType.CHECK: {

@@ -6,10 +6,6 @@ import { ColumnType } from "../../../common/components/form/types/enum";
 const SignUp = () => {
   const [signUpRequest, setSignUpRequest] = useState<SignUpRequest>({});
 
-  // const handleSubmit = () => {
-  //   console.log("1");
-  // };
-
   return (
     <div>
       <Grid container>
@@ -21,6 +17,8 @@ const SignUp = () => {
           size={{ xs: 10, lg: 4 }}
         >
           <FPForm
+            useButton
+            buttonElement={"회원가입"}
             data={signUpRequest}
             setData={setSignUpRequest}
             columns={[

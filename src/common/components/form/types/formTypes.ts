@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { ColumnType } from "./enum";
 import type {
+  ButtonProps,
   CheckboxProps,
   RadioProps,
   SelectProps,
@@ -12,14 +13,20 @@ export interface FormProps<T extends Record<string, unknown>> {
   data: T;
   setData: Dispatch<SetStateAction<T>>;
   columns: FormColumnProps<T>[];
+  useButton?: boolean;
+  buttonElement?: string | React.ReactElement<ButtonProps>;
+  onSubmit?: (callback: T) => void;
 }
 
 export type FormColumnProps<T> =
-  | (CheckColumnProps & BaseFormColumnProps<T>)
-  | (CustomColumnProps & BaseFormColumnProps<T>)
-  | (InputColumnProps & BaseFormColumnProps<T>)
-  | (RadioColumnProps & BaseFormColumnProps<T>)
-  | (SelectColumnProps & BaseFormColumnProps<T>);
+  | (Omit<CheckColumnProps, "onValueChange" | "value"> & BaseFormColumnProps<T>)
+  | (Omit<CustomColumnProps, "onValueChange" | "value"> &
+      BaseFormColumnProps<T>)
+  | (Omit<SelectColumnProps, "onValueChange" | "value"> &
+      BaseFormColumnProps<T>)
+  | (Omit<InputColumnProps, "onValueChange" | "value"> & BaseFormColumnProps<T>)
+  | (Omit<RadioColumnProps, "onValueChange" | "value"> &
+      BaseFormColumnProps<T>);
 
 interface FormError {
   isError: boolean;
@@ -29,7 +36,7 @@ interface FormError {
 export interface BaseFormColumnProps<T> {
   name: keyof T;
   label?: string;
-  size?:
+  colSize?:
     | GridSize
     | Array<GridSize | null>
     | { [key in Breakpoint]?: GridSize | null };
@@ -37,17 +44,8 @@ export interface BaseFormColumnProps<T> {
 }
 
 /**
- * Todo: 추후 unknown 으로 지정된것 확인해볼 필요 있음
+ * fixme: 추후 unknown 으로 지정된것 확인해볼 필요 있음
  */
-
-// export type BaseColumnFieldProps<T> = {} & (
-//   | (CheckColumnProps & BaseFormColumnProps<T>)
-//   | (CustomColumnProps & BaseFormColumnProps<T>)
-//   | (InputColumnProps & BaseFormColumnProps<T>)
-//   | (RadioColumnProps & BaseFormColumnProps<T>)
-//   | (SelectColumnProps & BaseFormColumnProps<T>)
-);
-
 export interface CustomColumnProps {
   columnType: ColumnType.CUSTOM;
   renderComponent: () => React.ReactElement;
@@ -76,3 +74,10 @@ export type CheckColumnProps = {
   value: unknown;
   onValueChange: (e: unknown) => void;
 } & Omit<CheckboxProps, "value">;
+
+export type ColumnProps<T extends Record<string, unknown>> =
+  | (CheckColumnProps & BaseFormColumnProps<T>)
+  | (CustomColumnProps & BaseFormColumnProps<T>)
+  | (InputColumnProps & BaseFormColumnProps<T>)
+  | (RadioColumnProps & BaseFormColumnProps<T>)
+  | (SelectColumnProps & BaseFormColumnProps<T>);
