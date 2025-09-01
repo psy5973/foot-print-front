@@ -1,9 +1,9 @@
-import { axiosController } from "../common/AxiosController";
+import { AxiosController } from "../common/AxiosController";
 
 const url = "/api/users";
 
 const signUp = (data: SignUpRequest) => {
-  return axiosController.post<SignUpRequest>(`${url}/signup`, data);
+  return AxiosController.post<SignUpRequest>(`${url}/signup`, data);
 };
 
-export { signUp };
+export const UserApi = { signUp };

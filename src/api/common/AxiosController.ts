@@ -3,9 +3,7 @@ import axios from "axios";
 import type { AxiosRequestConfig } from "axios";
 
 const instance = axios.create({
-  // Todo: env 파일 설정 후 주석 제거
-  baseURL:
-    /* process.env.REACT_APP_API_BASE_URL || */ "http://localhost:8080/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -36,7 +34,7 @@ instance.interceptors.response.use(
 );
 
 // 👉 단순히 함수 export
-export const axiosController = {
+export const AxiosController = {
   get: <T>(url: string, config?: AxiosRequestConfig) =>
     instance.get<T>(url, config),
   post: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) =>

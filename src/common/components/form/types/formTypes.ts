@@ -3,7 +3,7 @@ import type { ColumnType } from "./enum";
 import type {
   ButtonProps,
   CheckboxProps,
-  RadioProps,
+  RadioGroupProps,
   SelectProps,
   TextFieldProps,
 } from "@mui/material";
@@ -28,7 +28,7 @@ export type FormColumnProps<T> =
   | (Omit<RadioColumnProps, "onValueChange" | "value"> &
       BaseFormColumnProps<T>);
 
-interface FormError {
+export interface FormError {
   isError: boolean;
   message?: string;
 }
@@ -41,6 +41,7 @@ export interface BaseFormColumnProps<T> {
     | Array<GridSize | null>
     | { [key in Breakpoint]?: GridSize | null };
   error?: FormError;
+  required?: boolean;
 }
 
 /**
@@ -61,7 +62,7 @@ export type RadioColumnProps = {
   columnType: ColumnType.RADIO;
   value: unknown;
   onValueChange: (e: unknown) => void;
-} & Omit<RadioProps, "value">;
+} & Omit<RadioGroupProps, "value">;
 
 export type SelectColumnProps = {
   columnType: ColumnType.SELECT;
@@ -73,6 +74,7 @@ export type CheckColumnProps = {
   columnType: ColumnType.CHECK;
   value: unknown;
   onValueChange: (e: unknown) => void;
+  checkLabel?: string;
 } & Omit<CheckboxProps, "value">;
 
 export type ColumnProps<T extends Record<string, unknown>> =

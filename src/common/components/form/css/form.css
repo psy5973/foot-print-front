@@ -1,0 +1,7 @@
+.form-label {
+  font-size: 0.8em;
+}
+
+.form-label.required ::after {
+  content: "*";
+}

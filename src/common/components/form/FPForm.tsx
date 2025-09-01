@@ -2,9 +2,11 @@ import {
   Button,
   Checkbox,
   FormControl,
+  FormControlLabel,
   FormHelperText,
+  FormLabel,
   Grid,
-  Radio,
+  RadioGroup,
   Select,
   TextField,
   type ButtonProps,
@@ -21,6 +23,7 @@ import type {
   ColumnProps,
 } from "./types/formTypes";
 import { cloneElement, type ReactElement } from "react";
+import "./css/form.css";
 
 const FPForm = <T extends Record<string, unknown>>({
   data,
@@ -40,7 +43,7 @@ const FPForm = <T extends Record<string, unknown>>({
       return (
         <FormColumn
           {...item}
-          value={(data[item?.name] as unknown) || ""}
+          value={data[item?.name] as unknown}
           onValueChange={(v: unknown) =>
             setData((prev) => ({ ...prev, [item?.name]: v }))
           }
@@ -86,6 +89,8 @@ const FPForm = <T extends Record<string, unknown>>({
 const FormColumn = <T extends Record<string, unknown>>({
   error = { isError: false, message: "" },
   columnType = ColumnType.INPUT,
+  label = "",
+  value,
   onValueChange,
   ...props
 }: Exclude<ColumnProps<T>, CustomColumnProps> & {}) => {
@@ -95,36 +100,50 @@ const FormColumn = <T extends Record<string, unknown>>({
         const p = { ...(props as InputColumnProps) };
         return (
           <TextField
+            {...p}
+            value={value}
             size="small"
             onChange={(e) => onValueChange(e.target.value)}
-            {...p}
+            {...(error?.isError && { color: "error" })}
           />
         );
       }
       case ColumnType.CHECK: {
         const p = { ...(props as CheckColumnProps) };
         return (
-          <Checkbox
-            onChange={(e) => onValueChange(e.target.checked)}
-            {...p}
-          ></Checkbox>
+          <FormControlLabel
+            label={p?.checkLabel || ""}
+            control={
+              <Checkbox
+                checked={(p?.value as boolean) || false}
+                onChange={(e) => onValueChange(e.target.checked)}
+                {...p}
+              />
+            }
+          ></FormControlLabel>
         );
       }
       case ColumnType.RADIO: {
         const p = { ...(props as RadioColumnProps) };
-        return <Radio {...p}></Radio>;
+        return <RadioGroup {...p} value={value}></RadioGroup>;
       }
       case ColumnType.SELECT: {
         const p = { ...(props as SelectColumnProps) };
-        return <Select {...p}></Select>;
+        return <Select {...p} value={value}></Select>;
       }
     }
   };
 
+  /**
+   * Todo: error / success custom 필요
+   */
   return (
-    <FormControl className="w-100 mt-20" error={error?.isError}>
+    <FormControl className="w-100 mt-20">
+      {label && <FormLabel>{label}</FormLabel>}
       {renderer()}
-      {error?.isError && <FormHelperText>{error?.message}</FormHelperText>}
+      {error?.isError && (
+        <FormHelperText className="">{error?.message}</FormHelperText>
+      )}
     </FormControl>
   );
 };
