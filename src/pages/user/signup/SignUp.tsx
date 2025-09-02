@@ -1,19 +1,20 @@
 import { Button, Grid } from "@mui/material";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import FPForm from "../../../common/components/form/FPForm";
 import { ColumnType } from "../../../common/components/form/types/enum";
 import { UserApi } from "../../../api/user/UserApi";
 import type { FormError } from "../../../common/components/form/types/formTypes";
+import { CommonFunctions } from "../../../common/functions/CommonFunctions";
+import { useDebounce } from "../../../common/hooks/useDebounce";
 
 const SignUp = () => {
   type FormFieldError = {
     [K in keyof SignUpRequest]: FormError;
   };
 
-  const prevSignUpRequest = useRef<SignUpRequest>(null);
-
   const [signUpRequest, setSignUpRequest] = useState<SignUpRequest>({});
   const [formFieldError, setFormFieldError] = useState<FormFieldError>({});
+  const debounceEmailValue = useDebounce(signUpRequest?.email, 300);
 
   const handleSubmit = () => {
     UserApi.signUp(signUpRequest).then((res) => console.log(res));
@@ -22,28 +23,23 @@ const SignUp = () => {
   const handleValidateFormField = (key: keyof SignUpRequest) => {
     switch (key) {
       case "email":
-      default:
+        if (CommonFunctions.regExpEmail(signUpRequest?.email as string)) {
+          return;
+        }
+        setFormFieldError((prev) => ({
+          ...prev,
+          email: { isError: true, message: "이메일 형식을 확인해주세요." },
+        }));
         break;
+      default:
+        return;
     }
   };
 
-  // useEffect(() => {
-  //   if (prevSignUpRequest.current) {
-  //     const changedKeys = Object.keys(signUpRequest).filter(
-  //       (key) =>
-  //         signUpRequest[key as keyof SignUpRequest] !==
-  //         prevSignUpRequest.current![key as keyof SignUpRequest]
-  //     );
-
-  //     if (changedKeys.length > 0) {
-  //       console.log("변경된 필드:", changedKeys);
-  //       handleValidateFormField(changedKeys);
-  //     }
-  //   }
-
-  //   const changedField = signUpRequest;
-  //   handleValidateFormField();
-  // }, [signUpRequest]);
+  useEffect(() => {
+    // Todo: 이메일 중복확인
+    console.log("!!!!!!!!!!!!!");
+  }, [debounceEmailValue]);
 
   return (
     <div>
@@ -55,8 +51,9 @@ const SignUp = () => {
           alignItems={"center"}
           size={{ xs: 10, lg: 4 }}
         >
-          <div /* style={{ display: "block" }} */>
+          <div>
             <FPForm
+              onAfterChangeValue={(e) => handleValidateFormField(e?.key)}
               data={signUpRequest}
               setData={setSignUpRequest}
               columns={[
@@ -64,7 +61,8 @@ const SignUp = () => {
                   name: "email",
                   columnType: ColumnType.INPUT,
                   label: "이메일",
-                  error: { isError: true, message: "asdasd" },
+                  // error: { isError: true, message: "asdasd" }, // test
+                  error: formFieldError?.email,
                   variant: "outlined",
                   placeholder: "이메일 입력",
                 },
@@ -73,6 +71,7 @@ const SignUp = () => {
                   columnType: ColumnType.INPUT,
                   label: "비밀번호",
                   error: formFieldError?.password,
+                  helperText: "!23",
                 },
                 {
                   name: "passwordConfirm",

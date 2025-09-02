@@ -22,7 +22,7 @@ import type {
   CheckColumnProps,
   ColumnProps,
 } from "./types/formTypes";
-import { cloneElement, type ReactElement } from "react";
+import { cloneElement, useEffect, useRef, type ReactElement } from "react";
 import "./css/form.css";
 
 const FPForm = <T extends Record<string, unknown>>({
@@ -32,12 +32,14 @@ const FPForm = <T extends Record<string, unknown>>({
   useButton = false,
   buttonElement = "submit",
   onSubmit,
+  onAfterChangeValue,
 }: FormProps<T>) => {
   const columnRenderer = (item: FormColumnProps<T>) => {
     const { columnType } = item;
 
     if (columnType === ColumnType.CUSTOM) {
       // * custom Type
+      // ! 삭제예정
       return item?.renderComponent();
     } else {
       return (
@@ -47,6 +49,17 @@ const FPForm = <T extends Record<string, unknown>>({
           onValueChange={(v: unknown) =>
             setData((prev) => ({ ...prev, [item?.name]: v }))
           }
+          onAfterValueChange={(callback) => {
+            if (!onAfterChangeValue || !item?.onAfterValueChange) {
+              return;
+            }
+
+            if (onAfterChangeValue) {
+              onAfterChangeValue(callback);
+            } else if (item?.onAfterValueChange) {
+              item?.onAfterValueChange(callback);
+            }
+          }}
         />
       );
     }
@@ -94,6 +107,8 @@ const FormColumn = <T extends Record<string, unknown>>({
   onValueChange,
   ...props
 }: Exclude<ColumnProps<T>, CustomColumnProps> & {}) => {
+  const prevValuRef = useRef<unknown | null>(value || null);
+
   const renderer = () => {
     switch (columnType) {
       case ColumnType.INPUT: {
@@ -133,6 +148,18 @@ const FormColumn = <T extends Record<string, unknown>>({
       }
     }
   };
+
+  useEffect(() => {
+    if (props?.onAfterValueChange) {
+      props?.onAfterValueChange({
+        key: props?.name,
+        prevValue: prevValuRef?.current,
+        value: value,
+      });
+    }
+    prevValuRef.current = value;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   /**
    * Todo: error / success custom 필요

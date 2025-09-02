@@ -16,9 +16,16 @@ export interface FormProps<T extends Record<string, unknown>> {
   useButton?: boolean;
   buttonElement?: string | React.ReactElement<ButtonProps>;
   onSubmit?: (callback: T) => void;
+  onAfterChangeValue?: (callback: ChangeCallbackData<T>) => void;
 }
 
-export type FormColumnProps<T> =
+interface ChangeCallbackData<T extends Record<string, unknown>> {
+  key: keyof T;
+  prevValue: unknown;
+  value: unknown;
+}
+
+export type FormColumnProps<T extends Record<string, unknown>> =
   | (Omit<CheckColumnProps, "onValueChange" | "value"> & BaseFormColumnProps<T>)
   | (Omit<CustomColumnProps, "onValueChange" | "value"> &
       BaseFormColumnProps<T>)
@@ -33,7 +40,7 @@ export interface FormError {
   message?: string;
 }
 
-export interface BaseFormColumnProps<T> {
+export interface BaseFormColumnProps<T extends Record<string, unknown>> {
   name: keyof T;
   label?: string;
   colSize?:
@@ -42,16 +49,13 @@ export interface BaseFormColumnProps<T> {
     | { [key in Breakpoint]?: GridSize | null };
   error?: FormError;
   required?: boolean;
+  onAfterValueChange?: (callback: ChangeCallbackData<T>) => void;
 }
 
 /**
- * fixme: 추후 unknown 으로 지정된것 확인해볼 필요 있음
+ * fixme: 1. 추후 unknown 으로 지정된것 확인해볼 필요 있음
  */
-export interface CustomColumnProps {
-  columnType: ColumnType.CUSTOM;
-  renderComponent: () => React.ReactElement;
-  value?: never;
-}
+
 export type InputColumnProps = {
   columnType: ColumnType.INPUT;
   value: unknown;
@@ -76,6 +80,16 @@ export type CheckColumnProps = {
   onValueChange: (e: unknown) => void;
   checkLabel?: string;
 } & Omit<CheckboxProps, "value">;
+
+/**
+ *
+ * !DEPRECATED: custom column 추후 삭제 예정
+ */
+export interface CustomColumnProps {
+  columnType: ColumnType.CUSTOM;
+  renderComponent: () => React.ReactElement;
+  value?: never;
+}
 
 export type ColumnProps<T extends Record<string, unknown>> =
   | (CheckColumnProps & BaseFormColumnProps<T>)
