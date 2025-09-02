@@ -1,5 +1,5 @@
 import { Button, Grid } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import FPForm from "../../../common/components/form/FPForm";
 import { ColumnType } from "../../../common/components/form/types/enum";
 import { UserApi } from "../../../api/user/UserApi";
@@ -17,29 +17,33 @@ const SignUp = () => {
   const debounceEmailValue = useDebounce(signUpRequest?.email, 300);
 
   const handleSubmit = () => {
+    const errorField = Object.keys(formFieldError).find(
+      (key) => formFieldError[key as keyof FormFieldError]?.isError === true
+    );
+
+    if (errorField) {
+      return;
+    }
+
     UserApi.signUp(signUpRequest).then((res) => console.log(res));
   };
 
-  const handleValidateFormField = (key: keyof SignUpRequest) => {
-    switch (key) {
-      case "email":
-        if (CommonFunctions.regExpEmail(signUpRequest?.email as string)) {
-          return;
-        }
-        setFormFieldError((prev) => ({
-          ...prev,
-          email: { isError: true, message: "이메일 형식을 확인해주세요." },
-        }));
-        break;
-      default:
-        return;
+  const handleValidateEmail = useCallback(() => {
+    if (CommonFunctions.regExpEmail(debounceEmailValue as string)) {
+      return;
     }
-  };
+
+    // Todo: 이메일 중복확인
+
+    setFormFieldError((prev) => ({
+      ...prev,
+      email: { isError: true, message: "이메일 형식을 확인해주세요." },
+    }));
+  }, [debounceEmailValue]);
 
   useEffect(() => {
-    // Todo: 이메일 중복확인
-    console.log("!!!!!!!!!!!!!");
-  }, [debounceEmailValue]);
+    handleValidateEmail();
+  }, [handleValidateEmail]);
 
   return (
     <div>
@@ -53,7 +57,12 @@ const SignUp = () => {
         >
           <div>
             <FPForm
-              onAfterChangeValue={(e) => handleValidateFormField(e?.key)}
+              onAfterChangeValue={(e) =>
+                setFormFieldError((prev) => ({
+                  ...prev,
+                  [e.key]: { isError: false, message: null },
+                }))
+              }
               data={signUpRequest}
               setData={setSignUpRequest}
               columns={[
@@ -61,17 +70,19 @@ const SignUp = () => {
                   name: "email",
                   columnType: ColumnType.INPUT,
                   label: "이메일",
-                  // error: { isError: true, message: "asdasd" }, // test
                   error: formFieldError?.email,
                   variant: "outlined",
                   placeholder: "이메일 입력",
+                  color: "error",
                 },
                 {
                   name: "password",
                   columnType: ColumnType.INPUT,
                   label: "비밀번호",
                   error: formFieldError?.password,
-                  helperText: "!23",
+                  helperText: formFieldError?.password?.isError
+                    ? ""
+                    : "특수문자, 대문자, 숫자를 포함한 비밀번호를 입력해주세요",
                 },
                 {
                   name: "passwordConfirm",
@@ -90,13 +101,6 @@ const SignUp = () => {
                   columnType: ColumnType.INPUT,
                   label: "생년월일",
                   error: formFieldError?.birthDt,
-                },
-                {
-                  name: "birthDt",
-                  columnType: ColumnType.CHECK,
-                  label: "생년월일",
-                  error: formFieldError?.birthDt,
-                  checkLabel: "checkLabelTest",
                 },
               ]}
             />

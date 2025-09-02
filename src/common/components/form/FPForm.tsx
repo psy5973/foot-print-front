@@ -50,7 +50,7 @@ const FPForm = <T extends Record<string, unknown>>({
             setData((prev) => ({ ...prev, [item?.name]: v }))
           }
           onAfterValueChange={(callback) => {
-            if (!onAfterChangeValue || !item?.onAfterValueChange) {
+            if (!onAfterChangeValue && !item?.onAfterValueChange) {
               return;
             }
 
