@@ -6,6 +6,8 @@ import {
   FormHelperText,
   FormLabel,
   Grid,
+  MenuItem,
+  Radio,
   RadioGroup,
   Select,
   TextField,
@@ -140,11 +142,37 @@ const FormColumn = <T extends Record<string, unknown>>({
       }
       case ColumnType.RADIO: {
         const p = { ...(props as RadioColumnProps) };
-        return <RadioGroup {...p} value={value}></RadioGroup>;
+        return (
+          <RadioGroup
+            {...p}
+            value={value}
+            onChange={(e) => onValueChange(e.target?.value)}
+          >
+            {p?.options?.map((item) => (
+              <FormControlLabel
+                value={item?.value}
+                control={<Radio />}
+                label={item?.label}
+              />
+            ))}
+          </RadioGroup>
+        );
       }
       case ColumnType.SELECT: {
         const p = { ...(props as SelectColumnProps) };
-        return <Select {...p} value={value}></Select>;
+        return (
+          <Select
+            {...p}
+            value={value}
+            onChange={(e) => onValueChange(e.target?.value)}
+          >
+            {p?.options?.map((item) => (
+              <MenuItem value={item?.value}>
+                {item?.label || item?.value}
+              </MenuItem>
+            ))}
+          </Select>
+        );
       }
     }
   };

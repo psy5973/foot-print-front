@@ -66,12 +66,14 @@ export type RadioColumnProps = {
   columnType: ColumnType.RADIO;
   value: unknown;
   onValueChange: (e: unknown) => void;
+  options: Option[];
 } & Omit<RadioGroupProps, "value">;
 
 export type SelectColumnProps = {
   columnType: ColumnType.SELECT;
   value: unknown;
   onValueChange: (e: unknown) => void;
+  options: Option[];
 } & Omit<SelectProps, "value">;
 
 export type CheckColumnProps = {
@@ -80,6 +82,11 @@ export type CheckColumnProps = {
   onValueChange: (e: unknown) => void;
   checkLabel?: string;
 } & Omit<CheckboxProps, "value">;
+
+interface Option {
+  label?: string;
+  value: string;
+}
 
 /**
  *

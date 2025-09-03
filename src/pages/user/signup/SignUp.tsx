@@ -41,6 +41,11 @@ const SignUp = () => {
     }));
   }, [debounceEmailValue]);
 
+  // const handleValidatePassword = () => {
+  //   if (signUpRequest?.password) {
+  //   }
+  // };
+
   useEffect(() => {
     handleValidateEmail();
   }, [handleValidateEmail]);
@@ -83,25 +88,27 @@ const SignUp = () => {
                   helperText: formFieldError?.password?.isError
                     ? ""
                     : "특수문자, 대문자, 숫자를 포함한 비밀번호를 입력해주세요",
+                  type: "password",
                 },
                 {
                   name: "passwordConfirm",
                   columnType: ColumnType.INPUT,
                   label: "비밀번호 확인",
                   error: formFieldError?.passwordConfirm,
+                  type: "password",
                 },
-                {
-                  name: "userName",
-                  columnType: ColumnType.INPUT,
-                  label: "이름",
-                  error: formFieldError?.userName,
-                },
-                {
-                  name: "birthDt",
-                  columnType: ColumnType.INPUT,
-                  label: "생년월일",
-                  error: formFieldError?.birthDt,
-                },
+                // {
+                //   name: "userName",
+                //   columnType: ColumnType.INPUT,
+                //   label: "이름",
+                //   error: formFieldError?.userName,
+                // },
+                // {
+                //   name: "birthDt",
+                //   columnType: ColumnType.INPUT,
+                //   label: "생년월일",
+                //   error: formFieldError?.birthDt,
+                // },
               ]}
             />
           </div>
