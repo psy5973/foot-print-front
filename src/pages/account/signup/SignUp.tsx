@@ -4,7 +4,7 @@ import FPForm from "../../../common/components/form/FPForm";
 import { ColumnType } from "../../../common/components/form/types/enum";
 import { UserApi } from "../../../api/user/UserApi";
 import type { FormError } from "../../../common/components/form/types/formTypes";
-import { CommonFunctions } from "../../../common/functions/CommonFunctions";
+import { commonFunctions } from "../../../common/functions/commonFunctions";
 import { useDebounce } from "../../../common/hooks/useDebounce";
 
 const SignUp = () => {
@@ -29,22 +29,31 @@ const SignUp = () => {
   };
 
   const handleValidateEmail = useCallback(() => {
-    if (CommonFunctions.regExpEmail(debounceEmailValue as string)) {
-      return;
-    }
+    let validate: boolean = true;
+    let message: string = "";
+    if (!commonFunctions.regExpEmail(debounceEmailValue as string)) {
+      validate = false;
+      message = "";
+    } /*  else if () {
+      
+    } */
+    // if (CommonFunctions.regExpEmail(debounceEmailValue as string)) {
+    //   return;
+    // }
 
+    if (!validate) {
+      setFormFieldError((prev) => ({
+        ...prev,
+        email: { isError: true, message },
+      }));
+    }
     // Todo: 이메일 중복확인
 
-    setFormFieldError((prev) => ({
-      ...prev,
-      email: { isError: true, message: "이메일 형식을 확인해주세요." },
-    }));
+    // setFormFieldError((prev) => ({
+    //   ...prev,
+    //   email: { isError: true, message: "이메일 형식을 확인해주세요." },
+    // }));
   }, [debounceEmailValue]);
-
-  // const handleValidatePassword = () => {
-  //   if (signUpRequest?.password) {
-  //   }
-  // };
 
   useEffect(() => {
     handleValidateEmail();
