@@ -48,11 +48,6 @@ const SignUp = () => {
       }));
     }
     // Todo: 이메일 중복확인
-
-    // setFormFieldError((prev) => ({
-    //   ...prev,
-    //   email: { isError: true, message: "이메일 형식을 확인해주세요." },
-    // }));
   }, [debounceEmailValue]);
 
   useEffect(() => {
