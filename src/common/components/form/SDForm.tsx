@@ -26,8 +26,9 @@ import type {
 } from "./types/formTypes";
 import { cloneElement, useEffect, useRef, type ReactElement } from "react";
 import "./css/form.css";
+import { useDebounce } from "../../hooks/useDebounce";
 
-const FPForm = <T extends Record<string, unknown>>({
+const SDForm = <T extends Record<string, unknown>>({
   data,
   setData,
   columns,
@@ -41,16 +42,21 @@ const FPForm = <T extends Record<string, unknown>>({
 
     if (columnType === ColumnType.CUSTOM) {
       // * custom Type
-      // ! 삭제예정
+      // ! 삭제예정??
       return item?.renderComponent();
     } else {
       return (
         <FormColumn
           {...item}
           value={data[item?.name] as unknown}
-          onValueChange={(v: unknown) =>
-            setData((prev) => ({ ...prev, [item?.name]: v }))
-          }
+          onValueChange={(v: unknown) => {
+            // let fieldValue = v;
+            // if (item?.columnType === ColumnType.INPUT && item?.debounce) {
+            //   fieldValue = useDebounce(fieldValue, 300);
+            // }
+
+            setData((prev) => ({ ...prev, [item?.name]: v }));
+          }}
           onAfterValueChange={(callback) => {
             if (!onAfterChangeValue && !item?.onAfterValueChange) {
               return;
@@ -110,17 +116,23 @@ const FormColumn = <T extends Record<string, unknown>>({
   ...props
 }: Exclude<ColumnProps<T>, CustomColumnProps> & {}) => {
   const prevValuRef = useRef<unknown | null>(value || null);
+  // const currentVal = useState<unknown>(value || null);
+  const debounceValue = useDebounce(value, 300);
 
   const renderer = () => {
     switch (columnType) {
       case ColumnType.INPUT: {
         const p = { ...(props as InputColumnProps) };
+        const handleValueChange = (v: unknown) => {
+          const change = p?.debounce ? debounceValue : v;
+          onValueChange(change);
+        };
         return (
           <TextField
             {...p}
             value={value}
             size="small"
-            onChange={(e) => onValueChange(e.target.value)}
+            onChange={(e) => handleValueChange(e?.target?.value)}
             {...(error?.isError && { color: "error" })}
           />
         );
@@ -203,4 +215,4 @@ const FormColumn = <T extends Record<string, unknown>>({
   );
 };
 
-export default FPForm;
+export default SDForm;

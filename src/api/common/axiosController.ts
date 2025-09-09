@@ -34,7 +34,7 @@ instance.interceptors.response.use(
 );
 
 // 👉 단순히 함수 export
-export const AxiosController = {
+export const axiosController = {
   get: <T>(url: string, config?: AxiosRequestConfig) =>
     instance.get<T>(url, config),
   post: <T>(url: string, data?: unknown, config?: AxiosRequestConfig) =>

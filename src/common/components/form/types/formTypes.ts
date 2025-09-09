@@ -60,6 +60,7 @@ export type InputColumnProps = {
   columnType: ColumnType.INPUT;
   value: unknown;
   onValueChange: (e: unknown) => void;
+  debounce?: boolean;
 } & Omit<TextFieldProps, "error" | "value">;
 
 export type RadioColumnProps = {

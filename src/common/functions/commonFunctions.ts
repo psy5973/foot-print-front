@@ -4,10 +4,18 @@
  * @param email
  * @returns boolean
  */
-const regExpEmail = (email: string): boolean => {
-  const regExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return regExp.test(email);
+const isEmailPatternValid = (email: string): boolean => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email);
 };
+
+const isPasswordPatternValid = (password: string) => {
+  const passwordRegex =
+    /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+  return passwordRegex.test(password);
+};
+
 export const commonFunctions = {
-  regExpEmail,
+  isEmailPatternValid,
+  isPasswordPatternValid,
 };
